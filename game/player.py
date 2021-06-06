@@ -60,3 +60,5 @@ class player(pygame.sprite.Sprite):
                 self.dir = 0
             self.rect = self.rect.move((-speed, 0))
     
+    def update_location(self, x, y):
+        self.rect.move_ip(x, y)
