@@ -13,7 +13,7 @@ class player(pygame.sprite.Sprite):
         self.health = health
         self.stamina = stamina
         self.bullets = bullets
-
+        self.dir = 0 #0 for left, 1 for right
         self.change_state(0)
 
     #if attackin move player up a bit
@@ -36,6 +36,7 @@ class player(pygame.sprite.Sprite):
 
     def attacking(self, target, weapon):
         self.change_state(2)
+        self.attack_state = True
         self.stamina -= weapon.stamina_cost
         dmg = weapon.strength - target.defense
         target.take_damage(dmg)
@@ -44,4 +45,18 @@ class player(pygame.sprite.Sprite):
         self.image = pygame.image.load(self.player_state[state_int]).convert()
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
+
+    def movement(self):
+        keys = pygame.key.get_pressed()
+        speed = 10
+        if keys[pygame.K_d]: # right key
+            if not self.dir: 
+                self.image = pygame.transform.flip(self.image, 1, 0)
+                self.dir = 1
+            self.rect = self.rect.move((speed, 0))
+        elif keys[pygame.K_a]: # left key
+            if self.dir:
+                self.image = pygame.transform.flip(self.image, 1, 0)
+                self.dir = 0
+            self.rect = self.rect.move((-speed, 0))
     
