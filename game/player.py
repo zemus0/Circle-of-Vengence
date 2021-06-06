@@ -8,7 +8,6 @@ class player(pygame.sprite.Sprite):
         self._attack_state = False
         self._damaged_state = False
         self.health = health
-        self.defending = False
         self._dir = 0 #0 for left, 1 for right
         self.change_state(0)
 
@@ -21,11 +20,11 @@ class player(pygame.sprite.Sprite):
         elif self._damaged_state:
             pass
 
-    def take_damage(self, dmg, defend):
+    def take_damage(self, dmg, defend, defend_time):
         self.change_state(1)
         self._damaged_state = True
-        if self.defending:
-            self.health -= dmg/2
+        if defend:
+            self.health -= dmg/(2/defend_time)
         else:
             self.health -= dmg
 
