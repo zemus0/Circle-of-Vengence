@@ -42,21 +42,21 @@ class player(pygame.sprite.Sprite):
         target.take_damage(dmg)
 
     def change_state(self, state_int):
-        self._image = pygame.image.load(self._player_state[state_int]).convert()
-        self._image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
-        self.rect = self._image.get_rect()
+        self.image = pygame.image.load(self._player_state[state_int]).convert()
+        self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
+        self.rect = self.image.get_rect()
 
     def movement(self):
         keys = pygame.key.get_pressed()
         speed = 10
         if keys[pygame.K_d]: # right key
             if not self._dir: 
-                self._image = pygame.transform.flip(self._image, 1, 0)
+                self.image = pygame.transform.flip(self.image, 1, 0)
                 self._dir = 1
             self.rect = self.rect.move((speed, 0))
         elif keys[pygame.K_a]: # left key
             if self._dir:
-                self._image = pygame.transform.flip(self._image, 1, 0)
+                self.image = pygame.transform.flip(self.image, 1, 0)
                 self._dir = 0
             self.rect = self.rect.move((-speed, 0))
     
