@@ -1,12 +1,14 @@
 import pygame
 import os, sys
 
+os.chdir('../game')
+
 class player(pygame.sprite.Sprite):
     def __init__(self, health, stamina, bullets):
         super().__init__()
-        self.player_state = [os.path.join('test_assets', 'player', 'normal_player.png'), 
-                            os.path.join('test_assets', 'player', 'damaged_player.png'),
-                            os.path.join('test_assets', 'player', 'attacking_player.png')]
+        self.player_state = [os.path.join('assets', 'player', 'normal_player.png'), 
+                            os.path.join('assets', 'player', 'damaged_player.png'),
+                            os.path.join('assets', 'player', 'attacking_player.png')]
         self.taking_dmg_moveset = [] #to be fill in with int
         self.attacking_moveset = [] #to be fill in with int
         self.attack_state = False
@@ -70,7 +72,7 @@ def main():
     screen = pygame.display.set_mode((1600,900))
     pygame.display.set_caption("Test_player")
 
-    background = pygame.image.load(os.path.join('test_assets','scene1', 'background.png')).convert()
+    background = pygame.image.load(os.path.join('assets','scene1', 'background.png')).convert()
     screen.blit(background, (0, 0))
     pygame.display.flip()
 
