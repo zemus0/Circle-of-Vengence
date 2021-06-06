@@ -1,5 +1,4 @@
-import pygame
-import os, sys
+import pygame, os, sys
 
 class cursor(pygame.sprite.Sprite):
     def __init__(self):
