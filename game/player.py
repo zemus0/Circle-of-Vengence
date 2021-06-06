@@ -1,18 +1,14 @@
-import pygame
-import os, sys
+import pygame, os, sys
 class player(pygame.sprite.Sprite):
-    def __init__(self, health, stamina, bullets):
+    def __init__(self, health):
         super().__init__()
         self._player_state = [os.path.join('assets', 'player', 'normal_player.png'), 
                             os.path.join('assets', 'player', 'damaged_player.png'),
                             os.path.join('assets', 'player', 'attacking_player.png')]
-        self._taking_dmg_moveset = [] #to be fill in with int
-        self._attacking_moveset = [] #to be fill in with int
         self._attack_state = False
         self._damaged_state = False
         self.health = health
-        self.stamina = stamina
-        self.bullets = bullets
+        self.defending = False
         self._dir = 0 #0 for left, 1 for right
         self.change_state(0)
 
@@ -25,21 +21,20 @@ class player(pygame.sprite.Sprite):
         elif self._damaged_state:
             pass
 
-    #check mouse position, left click to interact.
-    def interact(self, target):
-        target.interact_w_player()
-
-    def take_damage(self, dmg):
+    def take_damage(self, dmg, defend):
         self.change_state(1)
         self._damaged_state = True
-        self.health -= dmg
+        if self.defending:
+            self.health -= dmg/2
+        else:
+            self.health -= dmg
 
-    def attacking(self, target, weapon):
+
+    def attacking(self, target, dmg):
         self.change_state(2)
         self._attack_state = True
-        self.stamina -= weapon.stamina_cost
-        dmg = weapon.strength - target.defense
         target.take_damage(dmg)
+
 
     def change_state(self, state_int):
         self.image = pygame.image.load(self._player_state[state_int]).convert()
@@ -59,6 +54,6 @@ class player(pygame.sprite.Sprite):
                 self.image = pygame.transform.flip(self.image, 1, 0)
                 self._dir = 0
             self.rect = self.rect.move((-speed, 0))
-    
+
     def update_location(self, x, y):
         self.rect.move_ip(x, y)
