@@ -1,11 +1,10 @@
 import pygame
 
-def draw_text(txt, font_size, padx, pady, surface, position, color=(0, 0, 0)):
-    surface.fill((255, 255, 255))
+def draw_text(txt, font_size, padx, pady, width, surface, position, color=(0, 0, 0)):
+    surface.fill((0, 0, 0, 0))
     font = pygame.font.SysFont("monospace", font_size, True)
     space = font.size(' ')[0]
     text_array = [word.split(' ') for word in txt.splitlines()]
-    width = surface.get_size()[0]
     x, y = position
 
     for j, line in enumerate(text_array):
