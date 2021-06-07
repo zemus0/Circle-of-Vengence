@@ -86,7 +86,8 @@ def combat(enemy):
                 time_left = round(attack_cooldown - time_pass, 2)
                 draw_text(str(time_left), 20, 0, 0, 50, text_surface, player.rect.midbottom)
 
-        enemy.AI_logic(player)
+        if enemy.state != 3:
+            enemy.AI_logic(player)
 
         if player.state == 1:
             y = player.pos[1]

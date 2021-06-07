@@ -1,24 +1,27 @@
 import pygame, os, time
 from player import player_class
 from cursor import cursor
-from utils import draw_text
+from utils import (draw_text, dialog)
 
 def main():
     global mainscreen
     global mouse
     global player
-    
+    global text_box
     pygame.init()
     mainscreen = pygame.display.setmode((1600,900))
     pygame.display.set_caption("Circle of Violence")
     pygame.mouse.set_visible(False)
 
+    text_box = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
+    text_box.set_alpha(0)
     player = player_class(100, 5)
     mouse = cursor()
+    
 
-#def load_scene1():
-#    background = pygame.image.load(os.path.join('assets', 'scene1', 'background.png'))
-#    background = background.convert()
+def load_scene1():
+    background = pygame.image.load(os.path.join('assets', 'scene1', 'background.png')).convert()
+    
 
 
 def combat(enemy):
@@ -81,7 +84,8 @@ def combat(enemy):
                 time_left = round(attack_cooldown - time_pass, 2)
                 draw_text(str(time_left), 20, 0, 0, 50, text_surface, player.rect.midbottom)
 
-        enemy.AI_logic(player)
+        if enemy.state != 3:
+            enemy.AI_logic(player)
 
         if player.state == 1:
             y = player.pos[1]
