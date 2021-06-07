@@ -7,7 +7,7 @@ class player_class(pygame.sprite.Sprite):
                             os.path.join('assets', 'player', 'attacking_player.png')]
         
         self._attack_power = attack_power
-        self._dir = 0 #0 for left, 1 for right
+        self._dir = 1 #0 for left, 1 for right
         self._frame = 0
         self.state = 0
         self.dmg_taken = 0
