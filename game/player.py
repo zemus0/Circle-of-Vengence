@@ -1,5 +1,5 @@
 import pygame, os, sys, math
-class player(pygame.sprite.Sprite):
+class player_class(pygame.sprite.Sprite):
     def __init__(self, health, attack_power):
         super().__init__()
         self._player_state = [os.path.join('assets', 'player', 'normal_player.png'), 
@@ -11,26 +11,30 @@ class player(pygame.sprite.Sprite):
         self._state = 0
         self._frame = 0
         self.health = health
-        self.defending = False
-        self.defend_time = 0.1
+        self._defending = False
+        self._defend_time = 0.1
 
-        self.change_state(0)
+        self.image = pygame.image.load(self._player_state[0]).convert()
+        self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
+        self.rect = self.image.get_rect()
 
     def update(self):
-        if self._state == 2:
-            if self._frame <= 5:
-                self.rect.move(5, -5)
-            elif self._frame <= 10:
-                self.rect.move(-5, 5)
+        if self._state == 2: # 2 for attacking
+            move_dist = 10
+            if self._frame <= 15:
+                self.rect = self.rect.move((move_dist, -move_dist))
+            elif self._frame <= 30:
+                self.rect = self.rect.move((-move_dist, move_dist))
             else:
                 self.change_state(0)
                 self._frame = 0
             self._frame += 1
-        elif self._state == 1:
+        elif self._state == 1: # 1 for damaged
+            move_dist = 2
             if self._frame <= 5:
-                self.rect.move(-5, 5)
+                self.rect = self.rect.move((-move_dist, move_dist))
             elif self._frame <= 10:
-                self.rect.move(5, -5)
+                self.rect = self.rect.move((move_dist, -move_dist))
             else:
                 self.change_state(0)
                 self._frame = 0
@@ -53,7 +57,6 @@ class player(pygame.sprite.Sprite):
     def change_state(self, state_int):
         self.image = pygame.image.load(self._player_state[state_int]).convert()
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
-        self.rect = self.image.get_rect()
         self._state = state_int
 
     def movement(self):
