@@ -1,44 +1,60 @@
-import pygame, os, sys
+import pygame, os, sys, math
 class player(pygame.sprite.Sprite):
-    def __init__(self, health):
+    def __init__(self, health, attack_power):
         super().__init__()
         self._player_state = [os.path.join('assets', 'player', 'normal_player.png'), 
                             os.path.join('assets', 'player', 'damaged_player.png'),
                             os.path.join('assets', 'player', 'attacking_player.png')]
-        self._attack_state = False
-        self._damaged_state = False
-        self.health = health
+        
+        self._attack_power = attack_power
         self._dir = 0 #0 for left, 1 for right
+        self._state = 0
+        self._frame = 0
+        self.health = health
+        self.defending = False
+        self.defend_time = 0.1
+
         self.change_state(0)
 
-    #if attackin move player up a bit
-    #if takin dmg move player down a bit
-    #self.rect.move((x,y))
     def update(self):
-        if self._attack_state:
-            pass
-        elif self._damaged_state:
-            pass
+        if self._state == 2:
+            if self._frame <= 5:
+                self.rect.move(5, -5)
+            elif self._frame <= 10:
+                self.rect.move(-5, 5)
+            else:
+                self.change_state(0)
+                self._frame = 0
+            self._frame += 1
+        elif self._state == 1:
+            if self._frame <= 5:
+                self.rect.move(-5, 5)
+            elif self._frame <= 10:
+                self.rect.move(5, -5)
+            else:
+                self.change_state(0)
+                self._frame = 0
+            self._frame += 1
 
-    def take_damage(self, dmg, defend, defend_time):
+    def take_damage(self, dmg):
         self.change_state(1)
-        self._damaged_state = True
-        if defend:
-            self.health -= dmg/(2/defend_time)
+        if self._defending:
+            dmg = math.floor(dmg/(2/self._defend_time))
+            self.health -= dmg
         else:
             self.health -= dmg
 
 
-    def attacking(self, target, dmg):
+    def attacking(self, target):
         self.change_state(2)
-        self._attack_state = True
-        target.take_damage(dmg)
+        target.take_damage(self._attack_power)
 
 
     def change_state(self, state_int):
         self.image = pygame.image.load(self._player_state[state_int]).convert()
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
+        self._state = state_int
 
     def movement(self):
         keys = pygame.key.get_pressed()
