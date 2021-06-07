@@ -5,7 +5,7 @@ os.chdir('../game')
 from enemy import enemy_class
 from player import player_class
 from cursor import cursor
-from enemies import rat
+from enemies import rat_enemy
 from utils import draw_text
 
 
@@ -22,8 +22,8 @@ def main():
     
     player = player_class(100, 20)
     mouse = cursor()
-    mouse = rat() 
-    combat(mouse)
+    rat = rat_enemy() 
+    combat(rat)
 
 
 def combat(enemy):

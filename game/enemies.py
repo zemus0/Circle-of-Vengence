@@ -1,7 +1,7 @@
 import os
 from enemy import enemy_class
 
-class rat(enemy_class):
+class rat_enemy(enemy_class):
     def __init__(self):
         super().__init__(50, 5, (1330, 150), os.path.join('assets', 'scene1', 'rat.png'))
     
