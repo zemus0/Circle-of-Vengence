@@ -1,8 +1,9 @@
 import pygame, os, sys, time
+
+from test_player import player_class
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), 'game'))
 os.chdir('../game')
 
-from player import player_class
 from cursor import cursor
 from enemy import enemy_class
 from utils import draw_text
@@ -28,7 +29,8 @@ def main():
 
 
 def combat(enemy):
-    text_surface = pygame.Surface((340, 235))
+    text_surface = pygame.Surface((1600, 900), pygame.SRCALPHA)
+    dmg_text_displacement = 0
     sprites = pygame.sprite.RenderPlain((player, enemy, mouse))
     player.update_location(500, 400)
     enemy.update_location(enemy.combat_coord)
@@ -42,9 +44,19 @@ def combat(enemy):
     time_defending_start = time.time()
     timer_attack = time.time()
     running = True
+    a = 0
     while running:
         clock.tick(60)
         
+        text_surface.fill((0, 0, 0, 0))
+
+        #Ai_logic() here
+        if a == 100:
+            enemy.attacking(player)
+            a = 0
+        else:
+            a += 1
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -59,21 +71,38 @@ def combat(enemy):
                 time_defending_start = time.time()
                 player.defend_time = 0
                 player.defending = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_a: #attack
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_a and player.state != 1: #attack
                 if not cooldown:
                     player.attacking(enemy)
                     timer_attack = time.time()
                     cooldown = True
-                if cooldown and  time.time() - timer_attack >= 5:
+                if cooldown and time.time() - timer_attack >= 5:
                     cooldown = False
                     #add some sort of cool down graphics
 
-
+        if player.state == 1:
+            y = player.pos[1]-100 - dmg_text_displacement
+            dmg_text_displacement += 10
+            g = 255 - (7 * player.dmg_taken if player.dmg_taken < 35 else 255)
+            draw_text(f"-{player.dmg_taken}", 50, 0, 0, 50, text_surface, (player.pos[0], y), (255, g, 0))
+        else:
+            y = player.pos[1]
+            dmg_text_displacement = 0
+        if enemy.state == 1:
+            y = enemy.pos[1]-100 - dmg_text_displacement
+            dmg_text_displacement += 10
+            g = 255 - (7 * enemy.dmg_taken if enemy.dmg_taken < 35 else 255)
+            draw_text(f"-{enemy.dmg_taken}", 50, 0, 0, 50, text_surface, (enemy.pos[0], y), (255, g, 0))
+        else:
+            y = enemy.pos[1]
+            dmg_text_displacement = 0
+        
         stats = f"Player:\nHealth: {player.health}\n\nEnemy:\nHealth: {enemy.health}"
-        draw_text(stats, 35, 17, 10, text_surface, (0, 0))
+        draw_text(stats, 35, 17, 10, 340, text_surface, (0, 0))
+        
 
         sprites.update()
-
+        
         mainscreen.blits(blit_sequence=((background, (0, 0)),(text_surface, (0, 0))))
         sprites.draw(mainscreen)
         pygame.display.update()

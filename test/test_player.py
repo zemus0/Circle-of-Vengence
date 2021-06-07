@@ -10,18 +10,20 @@ class player_class(pygame.sprite.Sprite):
         
         self._attack_power = attack_power
         self._dir = 0 #0 for left, 1 for right
-        self._state = 0
         self._frame = 0
+        self.state = 0
+        self.dmg_taken = 0
         self.health = health
         self.defending = False
         self.defend_time = 0.1
-
+        
         self.image = pygame.image.load(self._player_state[0]).convert()
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
+        self.pos = self.rect.midtop
 
     def update(self):
-        if self._state == 2: # 2 for attacking
+        if self.state == 2: # 2 for attacking
             move_dist = 10
             if self._frame <= 15:
                 self.rect = self.rect.move((move_dist, -move_dist))
@@ -31,24 +33,25 @@ class player_class(pygame.sprite.Sprite):
                 self.change_state(0)
                 self._frame = 0
             self._frame += 1
-        elif self._state == 1: # 1 for damaged
+        elif self.state == 1: # 1 for damaged
             move_dist = 2
             if self._frame <= 5:
                 self.rect = self.rect.move((-move_dist, move_dist))
             elif self._frame <= 10:
                 self.rect = self.rect.move((move_dist, -move_dist))
-            else:
+            elif self._frame <= 30:
                 self.change_state(0)
                 self._frame = 0
+
             self._frame += 1
 
     def take_damage(self, dmg):
         self.change_state(1)
         if self.defending:
             dmg = math.floor(dmg/(2/self.defend_time))
-            self.health -= dmg
-        else:
-            self.health -= dmg
+        
+        self.health -= dmg
+        self.dmg_taken = dmg
 
 
     def attacking(self, target):
@@ -59,7 +62,7 @@ class player_class(pygame.sprite.Sprite):
     def change_state(self, state_int):
         self.image = pygame.image.load(self._player_state[state_int]).convert()
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
-        self._state = state_int
+        self.state = state_int
 
     def movement(self):
         keys = pygame.key.get_pressed()
@@ -77,6 +80,8 @@ class player_class(pygame.sprite.Sprite):
 
     def update_location(self, x, y):
         self.rect.move_ip(x, y)
+        self.pos = self.rect.midtop
+
 
 def main():
     pygame.init()
