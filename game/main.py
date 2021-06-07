@@ -1,7 +1,7 @@
-import pygame, os, sys, time, math
+import pygame, os, time
 from player import player_class
 from cursor import cursor
-
+from utils import draw_text
 
 def main():
     global mainscreen
@@ -16,16 +16,17 @@ def main():
     player = player_class(100, 5)
     mouse = cursor()
 
-
+#rat position (1330, 150)
 #def load_scene1():
 #    background = pygame.image.load(os.path.join('assets', 'scene1', 'background.png'))
 #    background = background.convert()
 
 
 def combat(enemy):
+    text_surface = pygame.Surface((340, 235))
     sprites = pygame.sprite.RenderPlain((player, enemy, mouse))
     player.update_location(500, 400)
-    enemy.update_location(enemy.combat_location)
+    enemy.update_location(enemy.combat_coord)
 
     clock = pygame.time.Clock()
     background = pygame.image.load(os.path.join('assets','battle scene.png')).convert()
@@ -38,7 +39,7 @@ def combat(enemy):
     running = True
     while running:
         clock.tick(60)
-
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -62,9 +63,12 @@ def combat(enemy):
                     cooldown = False
                     #add some sort of cool down graphics
 
+        stats = f"Player:\nHealth: {player.health}\n\nEnemy:\nHealth: {enemy.health}"
+        draw_text(stats, 35, 17, 10, text_surface, (0, 0))
+
         sprites.update()
 
-        mainscreen.blit(background, (0, 0))
+        mainscreen.blits(blit_sequence=((background, (0, 0)),(text_surface, (0, 0))))
         sprites.draw(mainscreen)
         pygame.display.update()
     
