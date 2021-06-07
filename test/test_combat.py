@@ -29,6 +29,7 @@ def main():
 
 
 def combat(enemy):
+    attack_cooldown = 3
     text_surface = pygame.Surface((1600, 900), pygame.SRCALPHA)
     sprites = pygame.sprite.RenderPlain((player, enemy, mouse))
     player.update_location((500, 400))
@@ -46,15 +47,6 @@ def combat(enemy):
     a = 0
     while running:
         clock.tick(60)
-        
-        text_surface.fill((0, 0, 0, 0))
-
-        #Ai_logic() here
-        if a == 100:
-            enemy.attacking(player)
-            a = 0
-        else:
-            a += 1
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -62,11 +54,13 @@ def combat(enemy):
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
 
+            pygame.key.set_repeat(1)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_d: #defend
-                timer = round(time.time() - time_defending_start, 2)
+                current = time.time()
+                timer = round(current - time_defending_start, 2)
                 player.defend_time = timer if timer < 2 and timer > 0 else 2
                 player.defending = True
-            elif not (event.type == pygame.KEYDOWN and event.key == pygame.K_d):
+            elif event.type == pygame.KEYUP and event.key == pygame.K_d:
                 time_defending_start = time.time()
                 player.defend_time = 0
                 player.defending = False
@@ -75,9 +69,18 @@ def combat(enemy):
                     player.attacking(enemy)
                     timer_attack = time.time()
                     cooldown = True
-                if cooldown and time.time() - timer_attack >= 1:
-                    cooldown = False
-                    #add some sort of cool down graphics
+
+        if cooldown:
+                    time_pass = time.time() - timer_attack
+                    if time_pass >= attack_cooldown:
+                        cooldown = False
+                    else:
+                        time_left = round(attack_cooldown - time_pass, 2)
+                        draw_text(str(time_left), 20, 0, 0, 50, text_surface, player.rect.midbottom)
+
+        #Ai_logic() here
+        
+
 
         if player.state == 1:
             y = player.pos[1]
@@ -101,8 +104,8 @@ def combat(enemy):
         
         mainscreen.blits(blit_sequence=((background, (0, 0)),(text_surface, (0, 0))))
         sprites.draw(mainscreen)
+        text_surface.fill((0, 0, 0, 0))
         pygame.display.update()
-        print(enemy.rect.h)
 
     pygame.quit()
 
