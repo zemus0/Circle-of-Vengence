@@ -8,8 +8,8 @@ class enemy_class(pygame.sprite.Sprite):
         self._attack_power = attack_power
         self._state = 0 #2 attackin, 1 taking dmg
         self._frame = 0
-        self._defending = False
-        self._defend_time = 0.1
+        self.defending = False
+        self.defend_time = 0.1
         self.health = health
         self.combat_coord = combat_coord
 
@@ -37,8 +37,8 @@ class enemy_class(pygame.sprite.Sprite):
 
     def take_damage(self, dmg):
         self._state = 1
-        if self._defending:
-            dmg = math.floor(dmg/(2/self._defend_time))
+        if self.defending:
+            dmg = math.floor(dmg/(2/self.defend_time))
             self.health -= dmg
         else:
             self.health -= dmg

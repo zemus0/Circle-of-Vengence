@@ -11,8 +11,8 @@ class player_class(pygame.sprite.Sprite):
         self._state = 0
         self._frame = 0
         self.health = health
-        self._defending = False
-        self._defend_time = 0.1
+        self.defending = False
+        self.defend_time = 0.1
 
         self.image = pygame.image.load(self._player_state[0]).convert()
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
@@ -42,8 +42,8 @@ class player_class(pygame.sprite.Sprite):
 
     def take_damage(self, dmg):
         self.change_state(1)
-        if self._defending:
-            dmg = math.floor(dmg/(2/self._defend_time))
+        if self.defending:
+            dmg = math.floor(dmg/(2/self.defend_time))
             self.health -= dmg
         else:
             self.health -= dmg
