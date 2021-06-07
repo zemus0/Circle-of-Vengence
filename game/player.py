@@ -43,17 +43,21 @@ class player_class(pygame.sprite.Sprite):
                 self.change_state(0)
                 self._frame = 0
                 self.update_location(self.combat_coord)
-
             self._frame += 1
+
 
     def take_damage(self, dmg):
         self.change_state(1)
         if self.defending:
             dmg = math.floor(dmg/(2/self.defend_time))
-        
+            
         self.health -= dmg
         self.dmg_taken = dmg
 
+    def death(self):
+        self.state = 3
+        self.rotation = 0
+        self.original = self.image
 
     def attacking(self, target):
         self.change_state(2)

@@ -52,6 +52,10 @@ class enemy_class(pygame.sprite.Sprite):
         self.dmg_taken = dmg
         self.health -= dmg
 
+    def death(self):
+        self.state == 3
+        self.rotation = 0
+        self.original = self.image
 
     def attacking(self, target):
         self.state = 2
