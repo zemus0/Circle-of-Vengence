@@ -19,6 +19,7 @@ class player_class(pygame.sprite.Sprite):
         self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
         self.pos = self.rect.midtop
+        self.combat_coord = 500, 400
 
     def update(self):
         if self.state == 2: # 2 for attacking
@@ -30,6 +31,7 @@ class player_class(pygame.sprite.Sprite):
             else:
                 self.change_state(0)
                 self._frame = 0
+                self.update_location(self.combat_coord)
             self._frame += 1
         elif self.state == 1: # 1 for damaged
             move_dist = 2
@@ -40,6 +42,7 @@ class player_class(pygame.sprite.Sprite):
             elif self._frame <= 30:
                 self.change_state(0)
                 self._frame = 0
+                self.update_location(self.combat_coord)
 
             self._frame += 1
 
@@ -76,6 +79,7 @@ class player_class(pygame.sprite.Sprite):
                 self._dir = 0
             self.rect = self.rect.move((-speed, 0))
 
-    def update_location(self, x, y):
-        self.rect.move_ip(x, y)
-        self.pos = self.rect.midtop
+    def update_location(self, coord):
+        self.rect.x = coord[0]
+        self.rect.y = coord[1]
+        self.pos = self.rect.center[0], self.rect.center[1] - self.rect.h

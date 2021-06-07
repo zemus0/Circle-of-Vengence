@@ -1,9 +1,9 @@
 import pygame, os, sys, time
 
-from test_player import player_class
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), 'game'))
 os.chdir('../game')
 
+from player import player_class
 from cursor import cursor
 from enemy import enemy_class
 from utils import draw_text
@@ -30,9 +30,8 @@ def main():
 
 def combat(enemy):
     text_surface = pygame.Surface((1600, 900), pygame.SRCALPHA)
-    dmg_text_displacement = 0
     sprites = pygame.sprite.RenderPlain((player, enemy, mouse))
-    player.update_location(500, 400)
+    player.update_location((500, 400))
     enemy.update_location(enemy.combat_coord)
 
     clock = pygame.time.Clock()
@@ -76,26 +75,23 @@ def combat(enemy):
                     player.attacking(enemy)
                     timer_attack = time.time()
                     cooldown = True
-                if cooldown and time.time() - timer_attack >= 5:
+                if cooldown and time.time() - timer_attack >= 1:
                     cooldown = False
                     #add some sort of cool down graphics
 
         if player.state == 1:
-            y = player.pos[1]-100 - dmg_text_displacement
-            dmg_text_displacement += 10
+            y = player.pos[1]
             g = 255 - (7 * player.dmg_taken if player.dmg_taken < 35 else 255)
             draw_text(f"-{player.dmg_taken}", 50, 0, 0, 50, text_surface, (player.pos[0], y), (255, g, 0))
         else:
             y = player.pos[1]
-            dmg_text_displacement = 0
+            
         if enemy.state == 1:
-            y = enemy.pos[1]-100 - dmg_text_displacement
-            dmg_text_displacement += 10
+            y = enemy.pos[1]
             g = 255 - (7 * enemy.dmg_taken if enemy.dmg_taken < 35 else 255)
             draw_text(f"-{enemy.dmg_taken}", 50, 0, 0, 50, text_surface, (enemy.pos[0], y), (255, g, 0))
         else:
             y = enemy.pos[1]
-            dmg_text_displacement = 0
         
         stats = f"Player:\nHealth: {player.health}\n\nEnemy:\nHealth: {enemy.health}"
         draw_text(stats, 35, 17, 10, 340, text_surface, (0, 0))
@@ -106,7 +102,8 @@ def combat(enemy):
         mainscreen.blits(blit_sequence=((background, (0, 0)),(text_surface, (0, 0))))
         sprites.draw(mainscreen)
         pygame.display.update()
-    
+        print(enemy.rect.h)
+
     pygame.quit()
 
 if __name__ == "__main__":
