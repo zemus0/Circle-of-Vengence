@@ -6,7 +6,7 @@ class cursor(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.join('assets', 'cursor_normal.png')).convert_alpha()
         self.rect = self.image.get_rect()
 
-    def update(self, interactables):
+    def update_cursor(self, interactables):
         collide_check = self.rect.collidelist(interactables)
         if collide_check != -1:
             self.image = pygame.image.load(os.path.join('assets', 'cursor_selectable.png')).convert_alpha()
