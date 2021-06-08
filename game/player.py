@@ -9,6 +9,7 @@ class player_class(pygame.sprite.Sprite):
         self._attack_power = attack_power
         self._dir = 1 #0 for left, 1 for right
         self._frame = 0
+        self.items = {}
         self.state = 0
         self.dmg_taken = 0
         self.health = health
