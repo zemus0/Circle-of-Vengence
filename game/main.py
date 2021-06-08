@@ -5,32 +5,8 @@ from utils import draw_text
 from enemy import enemy_class
 from entities import *
 
-def play():
-    global mainscreen
-    global text_box_original
-    global player
-    global mouse
-    
-    pygame.init()
-    mainscreen = pygame.display.set_mode((1600,900))
-    pygame.display.set_caption("Circle of Violence")
-    pygame.mouse.set_visible(False)
 
-    text_box_original = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
-    player = player_class(100, 20)
-    mouse = cursor()
-
-    do_player_died = scene1()
-    if do_player_died == True:
-        return True
-    elif do_player_died == False:
-        pass
-        print("to next scene")
-        #do_player_died = scene2()
-    elif do_player_died == None:
-        return None
-
-def scene1():
+def scene1(first_time=False):
     scene1_data = os.path.join('assets', 'scene1')
     background = pygame.image.load(os.path.join(scene1_data, 'background.png')).convert()
     text_box = text_box_original.copy()
@@ -38,21 +14,31 @@ def scene1():
     mainscreen.blit(background, (0, 0))
     pygame.display.flip()
 
-    player.update_location((540, 530))
-    rat = rat_enemy()
-    rat.update_location((65, 750))
-    jacket = jacket_class(os.path.join(scene1_data, 'jacket.png'))
+    if first_time:
+        player.update_location((540, 530))
+    else:
+        player.update_location(player.last_coord)
+
     jacket.update_location((150, 270))
-    letter = letter_class(os.path.join(scene1_data, 'letter.png'))
+    letter = letter_class()
     letter.update_location((1415, 700))
     door = door_class(os.path.join(scene1_data, 'door.png'))
     door.update_location((1300, 284))
     interactables = {
-        "rat": rat,
-        "letter": letter,
-        "jacket": jacket
+        "letter": letter
     }
-    sprites = pygame.sprite.RenderPlain((rat, jacket, letter, door, player, mouse))
+    
+    sprite_render = [jacket, letter, door, player, mouse]
+    
+
+    if rat.in_scene:
+        interactables["rat"] = rat
+        rat.update_location((65, 750))
+        sprite_render.insert(0, rat)
+    if jacket.in_scene:
+        interactables["jacket"] = jacket
+
+    sprites = pygame.sprite.RenderPlain(sprite_render)
 
     clock = pygame.time.Clock()
     running = True
@@ -103,12 +89,13 @@ def scene1():
             elif collide_with == "letter":
                 interactables["door"] = door
             elif collide_with == 3:
-                pass
-                #go outside
+                player.last_coord = (1333,530)
+                print("proceed to scene 2(WIP)")
+                #return scene2
             finish_dialog = False
         
         sprites.update()
-        player.movement()
+        player.movement(mainscreen)
         
         mainscreen.blits(((background, (0, 0)),(text_box, (0, 0))))
         sprites.draw(mainscreen)
@@ -226,6 +213,35 @@ def combat(enemy):
 
     if not combat_end:
         return None
+
+def play():
+    global mainscreen, text_box_original, mouse
+    global player, rat, jacket
+    
+    
+    mainscreen = pygame.display.set_mode((1600,900))
+    pygame.display.set_caption("Circle of Violence")
+    pygame.mouse.set_visible(False)
+
+    
+    text_box_original = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
+    player = player_class(100, 20)
+    jacket = jacket_class()
+    rat = rat_enemy()
+    mouse = cursor()
+
+    scene_play = scene1
+    do_player_died = scene_play(True)
+    while 1:
+        
+        if do_player_died == True:
+            return True
+        elif do_player_died == None:
+            return None
+        else:
+            scene_play = do_player_died
+
+        do_player_died = scene_play()
 
 
 def main():

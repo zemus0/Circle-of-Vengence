@@ -22,6 +22,7 @@ class player_class(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = self.rect.midtop
         self.combat_coord = 500, 400
+        self.last_coord = 0, 0
 
     def update(self):
         if self.state == 2: # 2 for attacking
