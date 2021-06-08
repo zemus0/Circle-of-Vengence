@@ -88,3 +88,4 @@ class player_class(pygame.sprite.Sprite):
         self.rect.x = coord[0]
         self.rect.y = coord[1]
         self.pos = self.rect.center[0], self.rect.center[1] - self.rect.h
+        self._dir = 1
