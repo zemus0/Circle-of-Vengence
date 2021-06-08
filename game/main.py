@@ -158,7 +158,7 @@ def combat(enemy):
                     time_defending_start = time.time()
                     player.defend_time = 0
                     player.defending = False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_a and player.state != 1: #attack
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_a: #attack
                     if not cooldown:
                         player.attacking(enemy)
                         timer_attack = time.time()
@@ -217,10 +217,10 @@ def combat(enemy):
             enemy.rotation += 2 if enemy.rotation < 90 else 0
             combat_animation_frame += 1
             enemy.image = pygame.transform.rotate(enemy.original, enemy.rotation)
-            if combat_animation_frame < 60:
-                pass
-            elif combat_animation_frame >= 60:
+            if combat_animation_frame >= 90:
                 return False
+            elif combat_animation_frame > 30:
+                enemy.after_death(mainscreen)
 
         pygame.display.update()
 
