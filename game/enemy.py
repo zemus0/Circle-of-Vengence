@@ -8,6 +8,7 @@ class enemy_class(pygame.sprite.Sprite):
         self._cooldown_timer = time.time()
         self._time_pass = 0
         self._index = -1
+        self._mid_animation = False
 
         if alpha:
             self.image = pygame.image.load(sprite_location).convert_alpha()
@@ -38,30 +39,35 @@ class enemy_class(pygame.sprite.Sprite):
 
     def update(self):
         if self.state == 1: # 1 for damaged
+            self._mid_animation = True
             move_dist = 2
             if self._frame <= 5:
                 self.rect = self.rect.move((move_dist, -move_dist))
             elif self._frame <= 10:
                 self.rect = self.rect.move((-move_dist, move_dist))
             elif self._frame <= 30:
+                self._mid_animation = False
                 self.state = 0
                 self._frame = 0
                 self.update_location(self.combat_coord)
             self._frame += 1
         elif self.state == 2: # 2 for attacking
+            self._mid_animation = True
             move_dist = 10
             if self._frame <= 15:
                 self.rect = self.rect.move((-move_dist, move_dist))
             elif self._frame <= 30:
                 self.rect = self.rect.move((move_dist, -move_dist))
             else:
+                self._mid_animation = False
                 self.state = 0
                 self._frame = 0
                 self.update_location(self.combat_coord)
             self._frame += 1
 
     def take_damage(self, dmg):
-        self.state = 1
+        if not self._mid_animation:
+            self.state = 1
         if self.defending:
             dmg = math.floor(dmg/(2/self.defend_time))
         
@@ -69,12 +75,14 @@ class enemy_class(pygame.sprite.Sprite):
         self.health -= dmg
 
     def death(self):
-        self.state == 3
+        if not self._mid_animation:
+            self.state == 3
         self.rotation = 0
         self.original = self.image
 
     def attacking(self, target):
-        self.state = 2
+        if not self._mid_animation:
+            self.state = 2
         target.take_damage(self._attack_power)
 
     def AI_logic(self, enemy, attack_cooldown, defend_frequency, min_defend_interval, max_defend_interval):
