@@ -1,12 +1,4 @@
-import pygame, os
-from enemy import enemy_class
-
-class rat_enemy(enemy_class):
-    def __init__(self):
-        super().__init__(os.path.join('assets', 'scene1', 'rat.png'), 50, 5, (1330, 150))
-    
-    def AI_logic(self, enemy):
-        return super().AI_logic(enemy, 1, 0.2, 1.5, 1.8)
+import pygame
 
 def draw_text(txt, font_size, padx, pady, width, screen, position, color=(0, 0, 0)):
     font = pygame.font.SysFont("monospace", font_size, True)
@@ -30,8 +22,3 @@ def draw_text(txt, font_size, padx, pady, width, screen, position, color=(0, 0, 
 
         x = position[0]
         y += text_h
-
-
-def dialog(text, dialog_box):
-    dialog_box.set_alpha(255)
-    draw_text(text, 45, 55, 55, 1490, dialog_box, (0, 0))
