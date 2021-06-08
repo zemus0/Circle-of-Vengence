@@ -1,27 +1,108 @@
 import pygame, os, time
 from player import player_class
 from cursor import cursor
-from utils import (draw_text, dialog)
+from utils import draw_text
+from entities import *
 
-def main():
+def play():
     global mainscreen
-    global mouse
+    global text_box_original
     global player
-    global text_box
+    global mouse
+    
     pygame.init()
     mainscreen = pygame.display.setmode((1600,900))
     pygame.display.set_caption("Circle of Violence")
     pygame.mouse.set_visible(False)
 
-    text_box = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
-    text_box.set_alpha(0)
+
+    text_box_original = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
     player = player_class(100, 5)
     mouse = cursor()
-    
 
-def load_scene1():
-    background = pygame.image.load(os.path.join('assets', 'scene1', 'background.png')).convert()
+    do_player_died = scene1()
+
+def scene1():
+    scene1_data = os.path.join('assets', 'scene1')
+    background = pygame.image.load(os.path.join(scene1_data, 'background.png')).convert()
+    text_box = text_box_original.copy()
+    text_box.set_alpha(0)
+    mainscreen.blit(background, (0, 0))
+    pygame.display.flip()
+
+    player.update_location((540, 530))
+    rat = rat_enemy()
+    rat.update_location((65, 750))
+    jacket = jacket_class(os.path.join(scene1_data, 'jacket.png'))
+    jacket.update_location((150, 270))
+    letter = letter_class(os.path.join(scene1_data, 'letter.png'))
+    letter.update_location((1415, 717))
+    door = door_class()
+    door.update_location
+    interactables = [rat, jacket, letter]
+    sprites = pygame.sprite.RenderPlain((rat, jacket, letter, door, player, mouse))
+
+    clock = pygame.time.Clock()
+    running = True
+    quit_game = False
+    interact = False
+    finish_dialog = False
+    while running:
+        clock.tick(60)
+        print(clock.get_fps())
+        if not interact:
+            collision = mouse.interact_check(interactables)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                quit_game = True
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                running = False
+                quit_game = True
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if collision != -1 and not interact:
+                    interact = True
+                if interact:
+                    text_box = text_box_original.copy()
+                    finish_dialog = interactables[collision].interact(text_box)
+                    if finish_dialog:
+                        text_box = text_box_original.copy()
+                        text_box.set_alpha(0)
+                        interact = False
+
+            if finish_dialog == 'e':
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+                    return False
+
+        #rat, jacket, letter
+        if finish_dialog:
+            if collision == 0:
+                original_pos = player.rect.center
+                ded = combat(interactables[collision])
+                if ded:
+                    return True
+                #remove rat from rendering
+                player.rect.center = original_pos
+                player.items['banana_bullet'] = True
+                text_box.set_alpha(255)
+                draw_text("You recieved a banana bullet!!!", 45, 55, 55, 1490, text_box, (0, 0))
+            elif collision == 1:
+                player.items['money'] = 50
+            elif collision == 2:
+                pass
+                #make the door interactable
+        
+        sprites.update()
+        player.movement()
+        
+        mainscreen.blits(((background, (0, 0)),(text_box, (0, 0))))
+        sprites.draw(mainscreen)
+        pygame.display.update()
     
+    if quit_game:
+        return None   
 
 
 def combat(enemy):
@@ -71,10 +152,7 @@ def combat(enemy):
                         cooldown = True
             elif player.state == 3:
                 if event.type == pygame.KEYDOWN:
-                    main()
-                    running = False
-                else:
-                    running = True
+                    return True
 
         if cooldown:
             time_pass = time.time() - timer_attack
@@ -127,9 +205,21 @@ def combat(enemy):
             combat_animation_frame += 1
             enemy.image = pygame.transform.rotate(enemy.original, enemy.rotation)
             if combat_animation_frame >= 120:
-                running = False
+                return False
 
         pygame.display.update()
 
     if not combat_end:
-        pygame.quit()
+        return None
+
+
+def main():
+    pygame.init()
+    quit_game = False
+    while True:
+        quit_game = play()
+        if quit_game == None:
+            break
+
+    pygame.quit()
+
