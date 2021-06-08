@@ -76,15 +76,16 @@ class player_class(pygame.sprite.Sprite):
         if not self._mid_animation:
             self.state = state_int
 
-    def movement(self):
+    def movement(self, mainscreen):
         keys = pygame.key.get_pressed()
+        width = mainscreen.get_width()
         speed = 10
-        if keys[pygame.K_d]: # right key
+        if keys[pygame.K_d] and self.rect.midright[0] + speed < width: # right key
             if not self._dir: 
                 self.image = pygame.transform.flip(self.image, 1, 0)
                 self._dir = 1
             self.rect = self.rect.move((speed, 0))
-        elif keys[pygame.K_a]: # left key
+        elif keys[pygame.K_a] and self.rect.midleft[0] - speed > 0: # left key
             if self._dir:
                 self.image = pygame.transform.flip(self.image, 1, 0)
                 self._dir = 0
