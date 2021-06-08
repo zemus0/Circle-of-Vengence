@@ -1,4 +1,5 @@
 import pygame, os, sys, math, time, random
+from utils import draw_text
 class enemy_class(pygame.sprite.Sprite):
     def __init__(self, sprite_location, health=0, attack_power=0, combat_coord=(0,0), alpha=False):
         super().__init__()
@@ -22,7 +23,17 @@ class enemy_class(pygame.sprite.Sprite):
         self.combat_coord = combat_coord
         self.dmg_taken = 0
         
-
+    
+    def interact(self, dialogs, index , text_box, event):
+        text_box.set_alpha(255)
+        if index > len(dialogs):
+            return None
+        else:
+            log = dialogs[index]
+            draw_text(log, 45, 55, 55, 1490, text_box, (0, 0))
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                return True
+            return False
 
     def update(self):
         if self.state == 1: # 1 for damaged
