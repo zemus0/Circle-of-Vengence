@@ -1,14 +1,18 @@
 import pygame, os, sys, math, time, random
 class enemy_class(pygame.sprite.Sprite):
-    def __init__(self, health, attack_power, combat_coord, sprite_location):
+    def __init__(self, sprite_location, health=0, attack_power=0, combat_coord=(0,0), alpha=False):
         super().__init__()
         self._attack_power = attack_power
         self._frame = 0
         self._cooldown_timer = time.time()
         self._time_pass = 0
 
-        self.image = pygame.image.load(sprite_location).convert()
-        self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
+        if alpha:
+            self.image = pygame.image.load(sprite_location).convert_alpha()
+        else:
+            self.image = pygame.image.load(sprite_location).convert()
+            self.image.set_colorkey((255, 255, 255), pygame.RLEACCEL)
+
         self.rect = self.image.get_rect()
         self.pos = self.rect.midtop
         self.state = 0 #2 attackin, 1 taking dmg
