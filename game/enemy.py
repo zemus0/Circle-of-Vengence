@@ -7,6 +7,7 @@ class enemy_class(pygame.sprite.Sprite):
         self._frame = 0
         self._cooldown_timer = time.time()
         self._time_pass = 0
+        self._index = -1
 
         if alpha:
             self.image = pygame.image.load(sprite_location).convert_alpha()
@@ -24,16 +25,16 @@ class enemy_class(pygame.sprite.Sprite):
         self.dmg_taken = 0
         
     
-    def interact(self, dialogs, index , text_box, event):
-        text_box.set_alpha(255)
-        if index > len(dialogs):
-            return None
+    def interact(self, dialog, text_box):
+        if self._index + 1 >= len(self._dialogs):
+            self._index = -1
+            return True
         else:
-            log = dialogs[index]
-            draw_text(log, 45, 55, 55, 1490, text_box, (0, 0))
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                return True
-            return False
+            self._index += 1
+        text_box.set_alpha(255)
+        log = dialog[self._index]
+        draw_text(log, 45, 55, 55, 1490, text_box, (0, 0))
+        return False
 
     def update(self):
         if self.state == 1: # 1 for damaged
