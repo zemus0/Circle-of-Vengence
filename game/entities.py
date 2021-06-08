@@ -5,6 +5,7 @@ from utils import draw_text
 class rat_enemy(enemy_class):
     def __init__(self):
         super().__init__(os.path.join('assets', 'scene1', 'rat.png'), 50, 5, (1330, 150))
+        self.in_scene = True
         self._dialogs = [
             "You saw a rat chewing on something...",
             "It hisses at you and charging in for the attack."
@@ -24,8 +25,8 @@ class rat_enemy(enemy_class):
 
 
 class letter_class(enemy_class):
-    def __init__(self, sprite_location):
-        super().__init__(sprite_location)
+    def __init__(self):
+        super().__init__(os.path.join('assets', 'scene1', 'letter.png'))
         self._dialogs = [
             "You pick up a letter and it say:\n\"I know the location of your father's killer...",
             "Meet me at 17th street ChickTie Ave 7713.\nYour friendly comrade.\""
@@ -35,8 +36,9 @@ class letter_class(enemy_class):
         return super().interact(self._dialogs, text_box)
         
 class jacket_class(enemy_class):
-    def __init__(self, sprite_location):
-        super().__init__(sprite_location, alpha=True)
+    def __init__(self):
+        super().__init__(os.path.join('assets', 'scene1', 'jacket.png'), alpha=True)
+        self.in_scene = True
         self._dialogs = [
             "You search through the pocket of your jacket and found...",
             "50 bucks."
@@ -49,6 +51,7 @@ class jacket_class(enemy_class):
 class door_class(enemy_class):
     def __init__(self, sprite_location):
         super().__init__(sprite_location, alpha=True)
+        self.in_scene = True
         self._dialogs = [
             "You set foot outside looking for your nenemsis"
         ]
