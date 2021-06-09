@@ -5,7 +5,7 @@ class enemy_class(pygame.sprite.Sprite):
         super().__init__()
         self._attack_power = attack_power
         self._frame = 0
-        self._cooldown_timer = time.time()
+        self._cooldown_timer = 0
         self._time_pass = 0
         self._index = -1
         self._mid_animation = False
@@ -85,8 +85,11 @@ class enemy_class(pygame.sprite.Sprite):
             self.state = 2
         target.take_damage(self._attack_power)
 
-    def AI_logic(self, enemy, attack_cooldown, defend_frequency, min_defend_interval, max_defend_interval):
-
+    def AI_logic(self, enemy, attack_cooldown, defend_frequency, min_defend_interval, max_defend_interval, wait):
+        if not self._cooldown_timer:
+            self._cooldown_timer = time.time() + wait
+            self.attack_cooldown = attack_cooldown
+        
         defend_logic = True if round(random.random(), 2) < defend_frequency else False
 
         if defend_logic: #defend
@@ -96,12 +99,14 @@ class enemy_class(pygame.sprite.Sprite):
             self.defend_time = 0
             self.defending = False
         
-        if self._time_pass >= attack_cooldown: # attack
+        if self._time_pass >= self.attack_cooldown: # attack
             self.attacking(enemy)
             self._cooldown_timer = time.time()
             self._time_pass = 0
         else:
             self._time_pass = time.time() - self._cooldown_timer
+        
+        return self._time_pass
 
     def update_location(self, coord):
         self.rect.x = coord[0]
