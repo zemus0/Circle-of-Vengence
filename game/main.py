@@ -342,7 +342,7 @@ def play():
 
     
     text_box_original = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
-    player = player_class(100, 120)
+    player = player_class(100, 20)
     jacket = jacket_class()
     rat = rat_enemy()
     mouse = cursor()
