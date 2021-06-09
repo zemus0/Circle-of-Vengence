@@ -1,7 +1,7 @@
 import pygame, os
 
 def draw_text(txt, font_size, padx, pady, width, screen, position, color=(0, 0, 0)):
-    font = pygame.font.SysFont(os.path.join('assets', 'monospaced.ttf'), font_size)
+    font = pygame.font.Font(os.path.join('assets', 'monospaced.ttf'), font_size)
     space = font.size(' ')[0]
     text_array = [word.split(' ') for word in txt.splitlines()]
     x, y = position
