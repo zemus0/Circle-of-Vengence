@@ -1,9 +1,115 @@
-import pygame, os, time
+import pygame, os, sys, time
 from player import player_class
 from cursor import cursor
 from utils import draw_text
 from enemy import enemy_class
 from entities import *
+
+def credit_scene():
+    background = pygame.image.load(os.path.join('assets', 'credit.png')).convert()
+    mainscreen.blit(background, (0, 0))
+    pygame.display.flip()
+    
+    sprites = pygame.sprite.RenderPlain([mouse])
+
+    clock = pygame.time.Clock()
+    while 1:
+        clock.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return None
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return None
+
+
+        mainscreen.blit(background, (0, 0))
+        sprites.draw(mainscreen)
+        pygame.display.update()
+
+
+
+
+def scene_final():
+    scene3_data = os.path.join('assets', 'scene3')
+    background = pygame.image.load(os.path.join(scene3_data, 'background.png')).convert()
+    text_box = text_box_original.copy()
+    text_box.set_alpha(0)
+    mainscreen.blit(background, (0, 0))
+    pygame.display.flip()
+
+    player.update_location((175, 550))
+    anti = antagonist_enemy()
+    anti.update_location((775, 500))
+    anti_son = antagonist_son()
+    anti_son.update_location((1290, 655))
+    interactables = {
+        "anti": anti
+    }
+
+    sprites = pygame.sprite.RenderPlain([anti, player, mouse])
+
+    clock = pygame.time.Clock()
+    running = True
+    quit_game = False
+    interact = False
+    finish_dialog = False
+    while running:
+        clock.tick(60)
+        if not interact:
+            collision = mouse.interact_check(interactables)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                quit_game = True
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                running = False
+                quit_game = True
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if collision != -1 and not interact:
+                    collide_with = collision
+                    interact = True
+                if interact:
+                    text_box = text_box_original.copy()
+                    finish_dialog = interactables[collide_with].interact(text_box)
+                    if finish_dialog:
+                        text_box = text_box_original.copy()
+                        text_box.set_alpha(0)
+                        interact = False
+
+
+
+        #rat, jacket, letter, door
+        if finish_dialog:
+            if collide_with == "anti":
+                original_pos = player.rect.x, player.rect.y
+                anti_original_pos = anti.rect.x, anti.rect.y
+                ded = combat(interactables[collide_with])
+                if ded:
+                    return True
+                sprites.add(anti_son)
+                interactables["anti"] = None
+                interactables["anti_son"] = anti_son
+                player.rect.x = original_pos[0]
+                player.rect.y = original_pos[1]
+                anti.rect.x = anti_original_pos[0]
+                anti.rect.y = anti_original_pos[1]
+            elif collide_with == "anti_son":
+                return credit_scene
+
+            finish_dialog = False
+        
+        sprites.update()
+        player.movement(mainscreen)
+        
+        mainscreen.blits(((background, (0, 0)),(text_box, (0, 0))))
+        sprites.draw(mainscreen)
+        pygame.display.update()
+    
+    if quit_game:
+        return None
 
 
 def scene1(first_time=False):
@@ -88,10 +194,9 @@ def scene1(first_time=False):
                 player.items['money'] = 50   
             elif collide_with == "letter":
                 interactables["door"] = door
-            elif collide_with == 3:
+            elif collide_with == "door":
                 player.last_coord = (1333,530)
-                print("proceed to scene 2(WIP)")
-                #return scene2
+                return scene_final
             finish_dialog = False
         
         sprites.update()
@@ -124,6 +229,7 @@ def combat(enemy):
     time_defending_start = time.time()
     timer_attack = time.time()
     running = True
+    defended = False
     while running:
         clock.tick(60)
 
@@ -137,12 +243,15 @@ def combat(enemy):
             if not combat_end:
                 pygame.key.set_repeat(1)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_d: #defend
+                    if not defended:
+                        time_defending_start = time.time()
                     current = time.time()
                     timer = round(current - time_defending_start, 2)
                     player.defend_time = timer if timer < 2 and timer > 0 else 2
                     player.defending = True
+                    defended = True
                 elif event.type == pygame.KEYUP and event.key == pygame.K_d:
-                    time_defending_start = time.time()
+                    defended = False
                     player.defend_time = 0
                     player.defending = False
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_a: #attack
@@ -161,9 +270,13 @@ def combat(enemy):
             else:
                 time_left = round(attack_cooldown - time_pass, 2)
                 draw_text(str(time_left), 20, 0, 0, 50, text_surface, player.rect.midbottom)
+        
+        
 
         if not combat_end:
-            enemy.AI_logic(player)
+            time_pass = enemy.AI_logic(player)
+            enemy_cooldown = round(enemy.attack_cooldown - time_pass, 2)
+            draw_text(str(enemy_cooldown), 20, 0, 0, 50, text_surface, enemy.rect.midbottom)
 
         if player.state == 1:
             y = player.pos[1]
@@ -184,8 +297,9 @@ def combat(enemy):
         
         sprites.update()
         
-        mainscreen.blits(blit_sequence=((background, (0, 0)),(text_surface, (0, 0))))
+        mainscreen.blit(background, (0, 0))
         sprites.draw(mainscreen)
+        mainscreen.blit(text_surface, (0, 0))
         text_surface.fill((0, 0, 0, 0))
 
         #death check
@@ -207,7 +321,10 @@ def combat(enemy):
             if combat_animation_frame >= 90:
                 return False
             elif combat_animation_frame > 30:
-                enemy.after_death(mainscreen)
+                try:
+                    enemy.after_death(mainscreen)
+                except:
+                    return False
 
         pygame.display.update()
 
@@ -225,7 +342,7 @@ def play():
 
     
     text_box_original = pygame.image.load(os.path.join('assets', 'dialog box.png')).convert_alpha()
-    player = player_class(100, 20)
+    player = player_class(100, 120)
     jacket = jacket_class()
     rat = rat_enemy()
     mouse = cursor()
